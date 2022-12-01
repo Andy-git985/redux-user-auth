@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { getUserDetails } from '../features/user/userActions';
+import { logout } from '../features/user/userSlice';
 import '../styles/header.css';
 
 const Header = () => {
@@ -23,7 +24,9 @@ const Header = () => {
         </span>
         <div className="cta">
           {userInfo ? (
-            <button className="button">Logout</button>
+            <button className="button" onClick={() => dispatch(logout())}>
+              Logout
+            </button>
           ) : (
             <NavLink className="button" to="/login">
               Login
