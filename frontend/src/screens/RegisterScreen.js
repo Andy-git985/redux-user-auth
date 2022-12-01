@@ -1,61 +1,81 @@
-import { useForm } from 'react-hook-form'
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Error from '../components/Error';
+import { registerUser } from '../features/user/userActions';
 
 const RegisterScreen = () => {
-  const { register, handleSubmit } = useForm()
+  const { loading, userInfo, error, success } = useSelector(
+    (state) => state.user
+  );
+  const dispatch = useDispatch();
+
+  const { register, handleSubmit } = useForm();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // redirect user to login page if registration was successful
+    if (success) navigate('/login');
+    // redirect authenticated user to profile screen
+    if (userInfo) navigate('/user-profile');
+  }, [navigate, userInfo, success]);
 
   const submitForm = (data) => {
+    // check if passwords match
     if (data.password !== data.confirmPassword) {
-      alert('Password mismatch')
-      return
+      alert('Password mismatch');
+      return;
     }
     // transform email string to lowercase to avoid case sensitivity issues during login
-    data.email = data.email.toLowerCase()
-    console.log(data)
-  }
-
+    data.email = data.email.toLowerCase();
+    dispatch(registerUser(data));
+  };
   return (
     <form onSubmit={handleSubmit(submitForm)}>
-      <div className='form-group'>
-        <label htmlFor='firstName'>First Name</label>
+      {/* render error message with Error component, if any */}
+      {error && <Error>{error}</Error>}
+      <div className="form-group">
+        <label htmlFor="firstName">First Name</label>
         <input
-          type='text'
-          className='form-input'
+          type="text"
+          className="form-input"
           {...register('firstName')}
           required
         />
       </div>
-      <div className='form-group'>
-        <label htmlFor='email'>Email</label>
+      <div className="form-group">
+        <label htmlFor="email">Email</label>
         <input
-          type='email'
-          className='form-input'
+          type="email"
+          className="form-input"
           {...register('email')}
           required
         />
       </div>
-      <div className='form-group'>
-        <label htmlFor='password'>Password</label>
+      <div className="form-group">
+        <label htmlFor="password">Password</label>
         <input
-          type='password'
-          className='form-input'
+          type="password"
+          className="form-input"
           {...register('password')}
           required
         />
       </div>
-      <div className='form-group'>
-        <label htmlFor='email'>Confirm Password</label>
+      <div className="form-group">
+        <label htmlFor="email">Confirm Password</label>
         <input
-          type='password'
-          className='form-input'
+          type="password"
+          className="form-input"
           {...register('confirmPassword')}
           required
         />
       </div>
-      <button type='submit' className='button'>
-        Login
+      <button type="submit" className="button" disabled={loading}>
+        Register
       </button>
     </form>
-  )
-}
-
-export default RegisterScreen
+  );
+};
+export default RegisterScreen;
